@@ -21,7 +21,6 @@ def create():
 
     # get the payload from request
     request_data = request.get_json()
-    print(request_data)
 
     # insert the data to collection
     mongo_collection.insert_one(request_data)
