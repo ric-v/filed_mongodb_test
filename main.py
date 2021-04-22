@@ -1,16 +1,7 @@
 #!/bin/python3
 from flask import Flask, request
-import pymongo, json
-from bson import json_util, ObjectId
-
-# New mongo DB client connection
-mongo_db_conn = pymongo.MongoClient("mongodb://localhost:27017/")
-
-# DB Name is filedtest
-database = mongo_db_conn["filedtest"]
-
-# collection is test
-mongo_collection = database["test"]
+from bson import json_util
+import pymongo, sys, getopt
 
 # new flas app
 app = Flask(__name__)
@@ -30,9 +21,10 @@ def create():
 
     # get the payload from request
     request_data = request.get_json()
+    print(request_data)
 
     # insert the data to collection
-    output = mongo_collection.insert_one(request_data)
+    mongo_collection.insert_one(request_data)
 
     return "success"
 
@@ -73,9 +65,6 @@ def update(audioFileType, audioFileID):
 
     # get the payload from request
     request_data = request.get_json()
-
-    # generate query for unsetting the audio file
-    query = {"audioFileType": audioFileType, "$set": request_data["audioFileMetadata"]}
 
     # execute the update query
     mongo_collection.update_one({"audioFileType": audioFileType}, { "$set": request_data["audioFileMetadata"]}, upsert=True)
@@ -132,5 +121,53 @@ def getAll(audioFileType, audioFileID):
     result = mongo_collection.find_one(query)
     return json_util.dumps(result)
 
+# default arg values
+port = 3000
+db_url = "mongodb://localhost:27017/"
+db_name = "filedtest"
+collection_name = "test"
+
+# get args from cmd line
+argv = sys.argv[1:]
+
+# get command line args 
+try:
+    opts, args = getopt.getopt(
+        argv,
+        "hpmdc:o:",
+        ["port=","db=","mongodb=","--db=","--collection="]
+    )
+    
+except getopt.GetoptError:
+    sys.exit(2)
+
+# iterate on each args and get the value for 
+# command line args
+for opt, arg in opts:
+
+    if opt == '-h':
+        sys.exit()
+
+    elif opt in ("-i", "--port"):
+        port = arg
+
+    elif opt in ("-m", "--mongodb"):
+        db_url = arg
+
+    elif opt in ("-d", "--db"):
+        db_name = arg
+
+    elif opt in ("-c", "--collection"):
+        collection_name = arg
+
+# New mongo DB client connection
+mongo_db_conn = pymongo.MongoClient(db_url)
+
+# DB Name is filedtest
+database = mongo_db_conn[db_name]
+
+# collection is test
+mongo_collection = database[collection_name]
+
 # runs the app on port 3000
-app.run("localhost",3000)
+app.run("localhost", port)

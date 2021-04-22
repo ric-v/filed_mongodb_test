@@ -1,0 +1,14 @@
+# create new entry
+curl -X POST "http://localhost:3000/create" -d '{"audioFileType":"song","audioFileMetadata":{"ID":1234256,"Name":"audio1","Duration":5,"UploadTime":"2020-01-02 15:00:00"}}' -H "Content-Type: application/json"
+
+# delete an entry
+curl -X POST "http://localhost:3000/delete/song/1234256"
+
+# update an entry
+curl -X POST "http://localhost:3000/update/song/1234256" -d '{"audioFileType":"song","audioFileMetadata":{"ID":1234256,"Name":"audio1","Duration":5,"UploadTime":"2020-01-02 15:00:00"}}' -H "Content-Type: application/json"
+
+# get all records under a category
+curl -X POST "http://localhost:3000/get/song"
+
+# get a specific record
+curl -X POST "http://localhost:3000/get/song/1234256"
